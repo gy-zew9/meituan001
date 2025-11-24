@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>美团外卖 - 送啥都快</title>
+  <!-- Tailwind CSS -->
+  <!-- 注意：Tailwind CDN是动态生成的，无法使用SRI，建议在生产环境使用预编译版本 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome 图标 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+  <!-- Content Security Policy -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; font-src 'self' https://cdnjs.cloudflare.com; img-src 'self' data: https:;">
+  <!-- 配置Tailwind主题（仿美团黄色主色调） -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            meituan: '#FFD100', // 美团黄
+            meituanRed: '#FF4D4F', // 美团红
+            grayLight: '#F5F5F5', // 浅灰背景
+            grayText: '#666666', // 灰色文字
+          },
+          fontFamily: {
+            sans: ['PingFang SC', 'Helvetica Neue', 'Arial', 'sans-serif'],
+          },
+        },
+      }
+    }
+  </script>
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .content-auto {
+        content-visibility: auto;
+      }
+      .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+      }
+      .text-shadow {
+        text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+      }
+    }
+  </style>
+</head>
+<body class="bg-grayLight font-sans text-gray-800">
+  <!-- 顶部导航栏（固定） -->
+  <header class="fixed top-0 left-0 right-0 bg-white shadow-sm z-50">
+    <div class="container mx-auto px-3 py-2 flex items-center justify-between">
+      <!-- Logo -->
+      <div class="flex items-center">
+        <i class="fa-solid fa-utensils text-meituan text-2xl mr-1"></i>
+        <span class="text-xl font-bold text-meituan">美团外卖</span>
+      </div>
+      <!-- 搜索框 -->
+      <div class="flex-1 mx-4 relative">
+        <input type="text" placeholder="搜索商家、美食、地址" 
+               class="w-full py-2 px-4 pl-10 rounded-full bg-grayLight focus:outline-none focus:ring-2 focus:ring-meituan/30">
+        <i class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-grayText"></i>
+      </div>
+      <!-- 用户入口 -->
+      <div class="flex items-center cursor-pointer" id="userMenuTrigger">
+        <i class="fa-solid fa-user-circle text-xl text-grayText mr-1"></i>
+        <span class="text-sm hidden sm:inline">我的</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- 用户菜单 -->
+  <div id="userMenu" class="fixed top-14 right-4 bg-white shadow-lg rounded-lg z-50 hidden w-48">
+    <div class="p-4 border-b border-gray-200">
+      <div class="flex items-center">
+        <i class="fa-solid fa-user-circle text-2xl text-meituan mr-3"></i>
+        <div>
+          <p class="font-medium">用户昵称</p >
+          <p class="text-xs text-grayText">普通会员</p >
+        </div>
+      </div>
+    </div>
+    <div class="py-2">
+      <a href="#" class="block px-4 py-2 hover:bg-gray-100">
+        <i class="fa-solid fa-receipt mr-2 text-grayText"></i>
+        我的订单
+      </a >
+      <a href="#" class="block px-4 py-2 hover:bg-gray-100">
+        <i class="fa-solid fa-heart mr-2 text-grayText"></i>
+        我的收藏
+      </a >
+      <a href="#" class="block px-4 py-2 hover:bg-gray-100">
+        <i class="fa-solid fa-ticket mr-2 text-grayText"></i>
+        优惠券
+      </a >
+      <a href="#" class="block px-4 py-2 hover:bg-gray-100" id="merchantEntryTrigger">
+        <i class="fa-solid fa-store mr-2 text-grayText"></i>
+        商家入驻
+      </a >
+      <a href="#" class="block px-4 py-2 hover:bg-gray-100">
+        <i class="fa-solid fa-gear mr-2 text-grayText"></i>
+        设置
+      </a >
+    </div>
+  </div>
+
+  <!-- 主内容区 -->
+  <main class="container mx-auto pt-16 pb-16">
+    <!-- 地址栏 -->
+    <div class="bg-white p-3 flex items-center justify-between">
+      <div class="flex items-center">
+        <i class="fa-solid fa-location-dot text-meituanRed mr-2"></i>
+        <span class="font-medium">北京市朝阳区建国路88号</span>
+        <i class="fa-solid fa-chevron-down text-xs ml-1 text-grayText"></i>
+      </div>
+      <div class="text-meituanRed text-sm flex items-center">
+        <i class="fa-solid fa-map-marker-alt mr-1"></i>
+        <span>切换地址</span>
+      </div>
+    </div>
+
+    <!-- 分类导航（横向滚动） -->
+    <div class="bg-white py-3 overflow-x-auto scrollbar-hide">
+      <div class="flex justify-around w-max px-3">
+        <div class="flex flex-col items-center px-4">
+          <div class="w-12 h-12 rounded-full bg-meituan flex items-center justify-center text-white text-xl mb-1">
+            <i class="fa-solid fa-utensils"></i>
+          </div>
+          <span class="text-sm">美食</span>
+        </div>
+        <div class="flex flex-col items-center px-4">
+          <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-grayText text-xl mb-1">
+            <i class="fa-solid fa-coffee"></i>
+          </div>
+          <span class="text-sm">饮品</span>
+        </div>
+        <div class="flex flex-col items-center px-4">
+          <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-grayText text-xl mb-1">
+            <i class="fa-solid fa-shopping-bag"></i>
+          </div>
+          <span class="text-sm">超市</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 商家列表区域 -->
+    <div class="mt-4">
+      <h2 class="text-lg font-bold mb-3 px-3">推荐商家</h2>
+      <!-- 商家列表内容可以在这里添加 -->
+    </div>
+  </main>
+
+  <!-- JavaScript 代码 -->
+  <script>
+    // 安全的DOM操作函数
+    (function() {
+      'use strict';
+      
+      // 防止XSS攻击的工具函数
+      function escapeHtml(text) {
+        const map = {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#039;'
+        };
+        return String(text).replace(/[&<>"']/g, m => map[m]);
+      }
+
+      // 显示/隐藏用户菜单
+      function showUserMenu() {
+        const menu = document.getElementById('userMenu');
+        if (menu) {
+          menu.classList.toggle('hidden');
+        }
+      }
+
+      // 商家入驻功能
+      function showMerchantEntry() {
+        // 安全的提示信息
+        alert('商家入驻功能开发中，敬请期待！');
+      }
+
+      // 使用事件委托，避免内联事件处理器
+      document.addEventListener('DOMContentLoaded', function() {
+        // 用户菜单触发器
+        const userMenuTrigger = document.getElementById('userMenuTrigger');
+        if (userMenuTrigger) {
+          userMenuTrigger.addEventListener('click', function(e) {
+            e.preventDefault();
+            showUserMenu();
+          });
+        }
+
+        // 商家入驻触发器
+        const merchantEntryTrigger = document.getElementById('merchantEntryTrigger');
+        if (merchantEntryTrigger) {
+          merchantEntryTrigger.addEventListener('click', function(e) {
+            e.preventDefault();
+            showMerchantEntry();
+          });
+        }
+
+        // 点击外部关闭菜单
+        document.addEventListener('click', function(e) {
+          const userMenu = document.getElementById('userMenu');
+          const userMenuTrigger = document.getElementById('userMenuTrigger');
+          
+          if (userMenu && userMenuTrigger && 
+              !userMenu.contains(e.target) && 
+              !userMenuTrigger.contains(e.target)) {
+            userMenu.classList.add('hidden');
+          }
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
